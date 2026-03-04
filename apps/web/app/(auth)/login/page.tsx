@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
@@ -94,11 +94,19 @@ export default function LoginPage() {
       </form>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
-        Don't have an account?{' '}
+        Don&apos;t have an account?{' '}
         <Link href="/signup" className="text-primary hover:underline font-medium">
           Sign up
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="w-full max-w-md p-8">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

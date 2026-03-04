@@ -4,6 +4,7 @@ import { db } from '@statushub/db';
 import { statusPages, components } from '@statushub/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { createComponentSchema } from '@/lib/validators/status-page';
+import { canAddComponent } from '@/lib/tier';
 
 // POST /api/pages/:id/components - Add a component to a status page
 export async function POST(
@@ -31,6 +32,12 @@ export async function POST(
 
     if (!page) {
       return NextResponse.json({ error: 'Status page not found' }, { status: 404 });
+    }
+
+    // Check plan limits
+    const tierCheck = await canAddComponent(params.id);
+    if (!tierCheck.allowed) {
+      return NextResponse.json({ error: tierCheck.reason }, { status: 403 });
     }
 
     const body = await request.json();

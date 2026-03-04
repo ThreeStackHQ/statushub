@@ -7,6 +7,9 @@ export const users = pgTable('users', {
   email: varchar('email', { length: 255 }).notNull().unique(),
   name: varchar('name', { length: 255 }),
   passwordHash: text('password_hash').notNull(),
+  stripeCustomerId: varchar('stripe_customer_id', { length: 255 }),
+  stripeSubscriptionId: varchar('stripe_subscription_id', { length: 255 }),
+  plan: varchar('plan', { length: 20 }).notNull().default('free'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
@@ -69,10 +72,10 @@ export const subscribers = pgTable('subscribers', {
 export const uptimeChecks = pgTable('uptime_checks', {
   id: uuid('id').primaryKey().defaultRandom(),
   componentId: uuid('component_id').notNull().references(() => components.id, { onDelete: 'cascade' }),
-  statusCode: integer('status_code'),
+  status: varchar('status', { length: 20 }).notNull().default('operational'), // operational, degraded, down
   responseTimeMs: integer('response_time_ms'),
-  success: boolean('success').notNull(),
-  errorMessage: text('error_message'),
+  statusCode: integer('status_code'),
+  error: text('error'),
   checkedAt: timestamp('checked_at').notNull().defaultNow(),
 });
 

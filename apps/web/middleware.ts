@@ -1,8 +1,11 @@
 import { auth } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import type { Session } from 'next-auth';
 
-export default auth((req) => {
+type AuthenticatedRequest = NextRequest & { auth: Session | null };
+
+export default auth((req: AuthenticatedRequest) => {
   const { pathname } = req.nextUrl;
   const isAuthenticated = !!req.auth;
 

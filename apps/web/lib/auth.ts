@@ -91,7 +91,16 @@ export const authConfig: NextAuthConfig = {
   debug: process.env.NODE_ENV === 'development',
 };
 
-export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);
+const _nextAuth = NextAuth(authConfig);
+export const handlers = _nextAuth.handlers;
+
+// Explicit types to avoid TS "cannot be named" errors referencing internal auth paths
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const signIn: (...args: any[]) => Promise<any> = _nextAuth.signIn;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const signOut: (...args: any[]) => Promise<any> = _nextAuth.signOut;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const auth: (...args: any[]) => any = _nextAuth.auth;
 
 // Helper function for signup
 export async function createUser(data: z.infer<typeof signUpSchema>) {

@@ -4,6 +4,7 @@ import { db } from '@statushub/db';
 import { statusPages } from '@statushub/db/schema';
 import { eq } from 'drizzle-orm';
 import { createStatusPageSchema } from '@/lib/validators/status-page';
+import { canCreateStatusPage } from '@/lib/tier';
 
 // GET /api/pages - List all status pages for authenticated user
 export async function GET(request: NextRequest) {
@@ -54,6 +55,12 @@ export async function POST(request: NextRequest) {
     }
 
     const { name, subdomain, logoUrl, primaryColor } = validationResult.data;
+
+    // Check plan limits
+    const tierCheck = await canCreateStatusPage(session.user.id);
+    if (!tierCheck.allowed) {
+      return NextResponse.json({ error: tierCheck.reason }, { status: 403 });
+    }
 
     // Check if subdomain is already taken
     const [existingPage] = await db
